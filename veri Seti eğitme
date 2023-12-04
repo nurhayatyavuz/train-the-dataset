@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import sys
+ 
+import cv2
+import tensorflow.keras
+import tensorflow as tf
+import numpy as np
+print(f"Tensor Flow Version: {tf.__version__}")
+print(f"Keras Version: {tensorflow.keras.__version__}")
+print()
+print(f"Python {sys.version}")
+gpu = len(tf.config.list_physical_devices('GPU'))>0
+print("GPU is", "available" if gpu else "NOT AVAILABLE")
+
+
+# In[5]:
+
+
+import numpy as np
+from keras.datasets import mnist, cifar10
+from keras.models import Sequential, Model
+from keras.layers import Dense, Activation , Convolution2D, MaxPooling2D, Flatten, Dropout
+from keras.utils import np_utils
+
+
+# In[21]:
+
+
+input_size=784
+batch_size=128
+hidden_neurons=400
+classes=10
+epochs=10
+
+
+# In[37]:
+
+
+(X_train, Y_train), (X_test, Y_test)=cifar10.load_data()
+#X_train=X_train.reshape(60000, 32, 32, 1)
+#X_test=X_test.reshape(10000, 28, 28, 1)
+print(X_train.shape)
+X_train = np.mean(X_train, axis=3)
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
+X_test = np.mean(X_test, axis=3)
+X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], 1)
+X_train=X_train.astype('float32')
+X_test=X_test.astype('float32')
+X_train /=255
+X_test /=255
+Y_train= np_utils.to_categorical(Y_train, classes)
+Y_test=np_utils.to_categorical(Y_test, classes)
+
+
+
+
+# In[15]:
+
+
+model=Sequential()
+model.add(Convolution2D(32,(3,3), input_shape=(32,32,3)))
+model.add(Activation('relu'))
+model.add(Convolution2D(32,(3,3)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(hidden_neurons))
+model.add(Activation('relu'))
+model.add(Dense(classes))
+model.add(Activation('softmax'))
+
+
+# In[16]:
+
+
+models.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='Adam')
+
+
+# In[58]:
+
+
+X_train = np.random.rand(100, 32, 32, 1)
+Y_train = np.random.randint(10, size=(100,))
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.fit(X_train, Y_train, epochs=10)
+
+
+# In[70]:
+
+
+score = model.evaluate(X_train, Y_train, verbose=1)
+print('Train accurracy:', score[1])
+score = model.evaluate(X_test, Y_test, verbose=1)
+print('Test accuracy:', score[1])
+
+
+
+
+
